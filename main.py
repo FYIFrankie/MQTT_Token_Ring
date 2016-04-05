@@ -36,7 +36,7 @@ def main():
 
 
 	client = mqtt.Client()
-	client.will_set(get_lan_ip(), "dead - " + u_neighbor)
+	client.will_set(get_lan_ip(), "dead - " + get_u_neighbor())
 	client.on_connect = on_connect
 	client.on_message = on_message
 	#client.on_disconnect = on_disconnect
@@ -70,7 +70,12 @@ def get_lan_ip():
                 pass
     return ip
 
+def get_u_neighbor():
+	global u_neighbor
+	return u_neighbor
+
 def on_connect(client, userdata, flags, rc):
+	global u_neighbor
 	# Subscribing in on_connect() means that if we lose the connection and
 	# reconnect then subscriptions will be renewed.
 	client.subscribe(u_neighbor)
@@ -90,7 +95,8 @@ def on_message(client, userdata, msg):
 
 
 def on_disconnect(client, userdata, rc):
-	client.publish(client.will_set(get_lan_ip(), "dead - " + u_neighbor))
+	global u_neighbor
+	client.publish(get_lan_ip(), "dead - " + u_neighbor)
 
 
 
