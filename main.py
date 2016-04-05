@@ -4,29 +4,71 @@ import socket
 import fcntl
 import struct
 import sys
+import os
+import socket
+
+broker = ''
+u_neighbor = ''
+
+if os.name != "nt":
+    import fcntl
+    import struct
+
+    def get_interface_ip(ifname):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',
+                                ifname[:15]))[20:24])
 
 
-try:
-	broker = sys.argv[1]
-except IndexError as e:
-	print("Argument 1 should be the broker")
-	sys.exit(1)
-try:
-	u_neighbor = sys.argv[2]
-except IndexError as e:
-	print("Argument 2 should be the upstream neighbor")
-	sys.exit(1)
-try:
-	d_neighbor = sys.argv[3]
-except IndexError as e:
-	print("Argument 3 should be the downstream neighbor")
-	sys.exit(1)
+def main():
+	global u_neighbor
+	global broker
+	try:
+		broker = sys.argv[1]
+	except IndexError as e:
+		print("Argument 1 should be the broker")
+		sys.exit(1)
+	try:
+		u_neighbor = sys.argv[2]
+	except IndexError as e:
+		print("Argument 2 should be the upstream neighbor")
+		sys.exit(1)
 
-def get_first3_octets():
-	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.connect(("8.8.8.8", 80))
-	return s.getsockname()[0]
 
+	client = mqtt.Client()
+	client.will_set(get_lan_ip(), "dead - " + u_neighbor)
+	client.on_connect = on_connect
+	client.on_message = on_message
+	#client.on_disconnect = on_disconnect
+	client.connect(broker, 1883, 60)
+
+	# Blocking call that processes network traffic, dispatches callbacks and
+	# handles reconnecting.
+	# Other loop*() functions are available that give a threaded interface and a
+	# manual interface.
+	client.loop_forever()
+
+def get_lan_ip():
+    ip = socket.gethostbyname(socket.gethostname())
+    if ip.startswith("127.") and os.name != "nt":
+        interfaces = [
+            "eth0",
+            "eth1",
+            "eth2",
+            "wlan0",
+            "wlan1",
+            "wifi0",
+            "ath0",
+            "ath1",
+            "ppp0",
+            ]
+        for ifname in interfaces:
+            try:
+                ip = get_interface_ip(ifname)
+                break
+            except IOError:
+                pass
+    return ip
 
 def on_connect(client, userdata, flags, rc):
 	# Subscribing in on_connect() means that if we lose the connection and
@@ -36,7 +78,8 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-	if "dead" in msg.payload:
+	global u_neighbor
+	if "dead - " in msg.payload:
 		client.unsubscribe(u_neighbor)
 		print("Unsubscripted from " + u_neighbor)
 		u_neighbor = msg.payload[7:]
@@ -47,19 +90,9 @@ def on_message(client, userdata, msg):
 
 
 def on_disconnect(client, userdata, rc):
-	time.sleep(1)
-	client.connect(broker, 1883, 60)
+	client.publish(client.will_set(get_lan_ip(), "dead - " + u_neighbor))
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.on_disconnect = on_disconnect
-client.will_set(d_neighbor, "dead - " + u_neighbor)
 
-client.connect(broker, 1883, 60)
 
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-client.loop_forever()
+if __name__ == '__main__':
+	main()

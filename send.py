@@ -6,4 +6,4 @@ broker = '127.0.0.1'
 
 client = mqtt.Client()
 client.connect(broker, 1883, 60)
-client.publish('this_is_a_test', payload="This is a test")
+client.publish('192.168.0.9', payload="This is a test")
