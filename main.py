@@ -92,8 +92,8 @@ def on_message(client, userdata, msg):
 		print(msg.topic+" "+str(msg.payload))
 
 
-def on_disconnect(client, userdata, rc):
-	global u_neighbor
+#def on_disconnect(client, userdata, rc):
+	#global u_neighbor
 	#client.publish(get_lan_ip(), "dead - " + u_neighbor)
 
 
