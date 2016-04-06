@@ -15,7 +15,14 @@ participant = False
 leader = None
 UID = random.randrange(1, 9999)
 
+if os.name != "nt":
+    import fcntl
+    import struct
 
+    def get_interface_ip(ifname):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',
+                                ifname[:15]))[20:24])
 
 def get_lan_ip():
     ip = socket.gethostbyname(socket.gethostname())
@@ -38,17 +45,9 @@ def get_lan_ip():
             except IOError:
                 pass
     return ip
-    
+
 IP = get_lan_ip()
 
-if os.name != "nt":
-    import fcntl
-    import struct
-
-    def get_interface_ip(ifname):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',
-                                ifname[:15]))[20:24])
 
 
 def main():
