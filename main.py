@@ -93,6 +93,7 @@ def on_message(client, userdata, msg):
 		client.loop()
 		client.connect(broker, 1883, 60)
 		client.loop()
+		print("here")
 	else:
 		print(msg.topic+" "+str(msg.payload))
 
