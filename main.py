@@ -79,7 +79,6 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-	print(msg.payload)
 	global u_neighbor
 	if "dead - " in msg.payload:
 		client.unsubscribe(u_neighbor)
@@ -92,7 +91,8 @@ def on_message(client, userdata, msg):
 		client.loop()
 		client.will_set(get_lan_ip(), "dead - " + u_neighbor)
 		client.loop()
-		client.reconnect()
+		client.connect(broker, 1883, 60)
+		client.loop()
 	else:
 		print(msg.topic+" "+str(msg.payload))
 
