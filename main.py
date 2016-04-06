@@ -106,14 +106,18 @@ def on_message(client, userdata, msg):
 		client.subscribe(u_neighbor)
 		print("Subscribed to " + u_neighbor)
 	elif "election - " in msg.payload:
+		print("Election")
 		msg_UID = msg.payload[11:]
 		if int(msg_UID) > UID:
+			print("Greater")
 			participant = True
 			client.publish(u_neighbor, msg.payload)
 		elif msg_UID < UID and participant == False:
+			print("Less than")
 			participant = True
 			client.publish(u_neighbor, "election - " + str(UID))
 		elif msg_UID == UID:
+			print("Equal")
 			leader = get_lan_ip()
 			client.publish(u_neighbor, "leader - " + str(leader))
 			participant = False
