@@ -14,6 +14,31 @@ u_neighbor = ''
 participant = False
 leader = None
 UID = random.randrange(1, 9999)
+
+
+
+def get_lan_ip():
+    ip = socket.gethostbyname(socket.gethostname())
+    if ip.startswith("127.") and os.name != "nt":
+        interfaces = [
+            "eth0",
+            "eth1",
+            "eth2",
+            "wlan0",
+            "wlan1",
+            "wifi0",
+            "ath0",
+            "ath1",
+            "ppp0",
+            ]
+        for ifname in interfaces:
+            try:
+                ip = get_interface_ip(ifname)
+                break
+            except IOError:
+                pass
+    return ip
+    
 IP = get_lan_ip()
 
 if os.name != "nt":
@@ -65,27 +90,6 @@ def elect_leader(client):
 		client.publish(IP, payload='election - ' + str(UID))
 
 
-def get_lan_ip():
-    ip = socket.gethostbyname(socket.gethostname())
-    if ip.startswith("127.") and os.name != "nt":
-        interfaces = [
-            "eth0",
-            "eth1",
-            "eth2",
-            "wlan0",
-            "wlan1",
-            "wifi0",
-            "ath0",
-            "ath1",
-            "ppp0",
-            ]
-        for ifname in interfaces:
-            try:
-                ip = get_interface_ip(ifname)
-                break
-            except IOError:
-                pass
-    return ip
 
 def on_connect(client, userdata, flags, rc):
 	global u_neighbor
