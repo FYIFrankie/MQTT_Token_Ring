@@ -85,16 +85,6 @@ def on_message(client, userdata, msg):
 		print("Unsubscripted from " + u_neighbor)
 		u_neighbor = msg.payload[7:]
 		client.subscribe(u_neighbor)
-		print("Subscribed to " + u_neighbor)
-		client.loop()
-		client.disconnect()
-		print("also here")
-		print('and here')
-		client.will_set(get_lan_ip(), "dead - " + u_neighbor)
-		print("def here")
-		client.connect(broker, 1883, 60)
-		client.loop_forever()
-		print("here")
 	else:
 		print(msg.topic+" "+str(msg.payload))
 
