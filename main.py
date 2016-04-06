@@ -91,6 +91,7 @@ def on_message(client, userdata, msg):
 		client.loop()
 		client.will_set(get_lan_ip(), "dead - " + u_neighbor)
 		client.connect(broker, 1883, 60)
+		client.loop_forever()
 		print("here")
 	else:
 		print(msg.topic+" "+str(msg.payload))
