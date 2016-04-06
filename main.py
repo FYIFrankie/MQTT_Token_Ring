@@ -39,7 +39,7 @@ def main():
 	client.will_set(get_lan_ip(), "dead - " + u_neighbor)
 	client.on_connect = on_connect
 	client.on_message = on_message
-	#client.on_disconnect = on_disconnect
+	client.on_disconnect = on_disconnect
 	client.connect(broker, 1883, 60)
 
 	# Blocking call that processes network traffic, dispatches callbacks and
@@ -97,8 +97,8 @@ def on_message(client, userdata, msg):
 		print(msg.topic+" "+str(msg.payload))
 
 
-#def on_disconnect(client, userdata, rc):
-	#global u_neighbor
+def on_disconnect(client, userdata, rc):
+	global u_neighbor
 	#client.publish(get_lan_ip(), "dead - " + u_neighbor)
 
 
