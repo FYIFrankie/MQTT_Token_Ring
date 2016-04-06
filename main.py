@@ -89,7 +89,6 @@ def on_message(client, userdata, msg):
 		client.loop()
 		client.disconnect()
 		print("also here")
-		client.loop()
 		print('and here')
 		client.will_set(get_lan_ip(), "dead - " + u_neighbor)
 		print("def here")
