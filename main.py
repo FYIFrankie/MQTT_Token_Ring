@@ -99,6 +99,7 @@ def on_message(client, userdata, msg):
 
 def on_disconnect(client, userdata, rc):
 	global u_neighbor
+	print("Disconnected in a normal way")
 	#client.publish(get_lan_ip(), "dead - " + u_neighbor)
 
 
