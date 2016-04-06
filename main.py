@@ -90,6 +90,7 @@ def on_message(client, userdata, msg):
 		client.subscribe(u_neighbor)
 		print("Subscribed to " + u_neighbor)
 		time.sleep(1)
+		client.loop()
 		client.disconnect()
 		time.sleep(1)
 		#client.will_set(get_lan_ip(), "dead - " + u_neighbor)
