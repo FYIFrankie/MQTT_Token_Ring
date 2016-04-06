@@ -51,11 +51,11 @@ def main():
 	# handles reconnecting.
 	# Other loop*() functions are available that give a threaded interface and a
 	# manual interface.
-	threading.Thread(target=elect_leader).start()
+	threading.Thread(target=elect_leader, args=(client)).start()
 	client.loop_forever()
 
 
-def elect_leader():
+def elect_leader(client):
 	global participant
 	if leader == None:
 		participant = True
