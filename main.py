@@ -6,9 +6,14 @@ import struct
 import sys
 import os
 import socket
+import random
+import threading
 
 broker = ''
 u_neighbor = ''
+participant = False
+leader = None
+UID = random.randrange(1, 9999)
 
 if os.name != "nt":
     import fcntl
@@ -46,7 +51,16 @@ def main():
 	# handles reconnecting.
 	# Other loop*() functions are available that give a threaded interface and a
 	# manual interface.
+
 	client.loop_forever()
+
+
+def elect_leader():
+	global participant
+	if leader == None:
+		participant = True
+		client.publish(u_neighbor, payload='election - ' + str(UID))
+
 
 def get_lan_ip():
     ip = socket.gethostbyname(socket.gethostname())
@@ -80,11 +94,33 @@ def on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
 	global u_neighbor
+	global UID
+	global participant
+	global leader
 	if "dead - " in msg.payload:
 		client.unsubscribe(u_neighbor)
 		print("Unsubscripted from " + u_neighbor)
 		u_neighbor = msg.payload[7:]
 		client.subscribe(u_neighbor)
+		print("Subscribed to " + u_neighbor)
+	elif "election - " in msg.payload:
+		msg_UID = msg.payload[11:]
+		if int(msg_UID) > UID:
+			participant = True
+			client.publish(u_neighbor, msg.payload)
+		elif msg_UID < UID and participant == False:
+			participant = True
+			client.publish(u_neighbor, "election - " + str(UID))
+		elif msg_UID == UID:
+			leader = get_lan_ip()
+			client.publish(u_neighbor, "leader - " + str(leader))
+			participant = False
+	elif "leader - " in msg.payload:
+			msg_leader = msg.payload[9:]
+			if msg_leader != leader:
+				leader = msg_leader
+				participant = False
+				client.publish(u_neighbor, msg.payload)
 	else:
 		print(msg.topic+" "+str(msg.payload))
 
