@@ -117,6 +117,7 @@ def on_message(client, userdata, msg):
 			participant = False
 	elif "leader - " in msg.payload:
 			msg_leader = msg.payload[9:]
+			print("Leader is " + msg_leader)
 			if msg_leader != leader:
 				leader = msg_leader
 				participant = False
