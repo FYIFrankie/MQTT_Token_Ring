@@ -57,7 +57,9 @@ def main():
 
 def elect_leader(client):
 	global participant
+	global leader
 	if leader == None:
+		print("Starting elect leader")
 		participant = True
 		client.publish(u_neighbor, payload='election - ' + str(UID))
 
