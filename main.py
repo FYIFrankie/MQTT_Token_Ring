@@ -82,19 +82,15 @@ def on_message(client, userdata, msg):
 	print(msg.payload)
 	global u_neighbor
 	if "dead - " in msg.payload:
-		time.sleep(1)
 		client.unsubscribe(u_neighbor)
 		print("Unsubscripted from " + u_neighbor)
-		time.sleep(1)
 		u_neighbor = msg.payload[7:]
 		client.subscribe(u_neighbor)
 		print("Subscribed to " + u_neighbor)
-		time.sleep(1)
 		client.loop()
 		client.disconnect()
-		time.sleep(1)
-		#client.will_set(get_lan_ip(), "dead - " + u_neighbor)
-		#client.reconnect()
+		client.will_set(get_lan_ip(), "dead - " + u_neighbor)
+		client.reconnect()
 	else:
 		print(msg.topic+" "+str(msg.payload))
 
