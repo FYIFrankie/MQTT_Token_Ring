@@ -14,6 +14,7 @@ u_neighbor = ''
 participant = False
 leader = None
 UID = random.randrange(1, 9999)
+IP = get_lan_ip()
 
 if os.name != "nt":
     import fcntl
@@ -61,7 +62,7 @@ def elect_leader(client):
 	if leader == None:
 		print("Starting elect leader")
 		participant = True
-		client.publish(u_neighbor, payload='election - ' + str(UID))
+		client.publish(IP, payload='election - ' + str(UID))
 
 
 def get_lan_ip():
@@ -111,15 +112,15 @@ def on_message(client, userdata, msg):
 		if int(msg_UID) > UID:
 			print("Greater")
 			participant = True
-			client.publish(u_neighbor, msg.payload)
+			client.publish(IP, msg.payload)
 		elif msg_UID < UID and participant == False:
 			print("Less than")
 			participant = True
-			client.publish(u_neighbor, "election - " + str(UID))
+			client.publish(IP, "election - " + str(UID))
 		elif msg_UID == UID:
 			print("Equal")
 			leader = get_lan_ip()
-			client.publish(u_neighbor, "leader - " + str(leader))
+			client.publish(IP, "leader - " + str(leader))
 			participant = False
 	elif "leader - " in msg.payload:
 			msg_leader = msg.payload[9:]
@@ -127,7 +128,7 @@ def on_message(client, userdata, msg):
 			if msg_leader != leader:
 				leader = msg_leader
 				participant = False
-				client.publish(u_neighbor, msg.payload)
+				client.publish(IP, msg.payload)
 	else:
 		print(msg.topic+" "+str(msg.payload))
 
