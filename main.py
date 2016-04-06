@@ -86,8 +86,8 @@ def on_message(client, userdata, msg):
 		u_neighbor = msg.payload[7:]
 		client.subscribe(u_neighbor)
 		print("Subscribed to " + u_neighbor)
-		client.will_set(get_lan_ip(), "dead - " + u_neighbor)
 		client.disconnect()
+		client.will_set(get_lan_ip(), "dead - " + u_neighbor)
 		#client.reconnect()
 	else:
 		print(msg.topic+" "+str(msg.payload))
