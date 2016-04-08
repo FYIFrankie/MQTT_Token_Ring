@@ -112,15 +112,12 @@ def on_message(client, userdata, msg):
 	elif "election - " in msg.payload:
 		msg_UID = msg.payload[11:]
 		if int(msg_UID) > UID:
-			print("Greater")
 			participant = True
 			client.publish(IP, msg.payload)
 		elif int(msg_UID) < UID:
-			print("Less than")
 			participant = True
 			client.publish(IP, "election - " + str(UID))
 		elif int(msg_UID) == UID:
-			print("Equal")
 			leader = get_lan_ip()
 			client.publish(IP, "leader - " + str(leader))
 			participant = False
