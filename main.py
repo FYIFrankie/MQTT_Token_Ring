@@ -111,8 +111,6 @@ def on_message(client, userdata, msg):
 		print("Subscribed to " + u_neighbor)
 	elif "election - " in msg.payload:
 		msg_UID = msg.payload[11:]
-		print("msg_UID is" + str(msg_UID))
-		print("my UID is " + str(UID))
 		if int(msg_UID) > UID:
 			print("Greater")
 			participant = True
