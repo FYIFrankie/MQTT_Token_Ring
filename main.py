@@ -117,8 +117,7 @@ def on_message(client, userdata, msg):
 			print("Greater")
 			participant = True
 			client.publish(IP, msg.payload)
-
-		elif int(msg_UID) < UID and participant == False:
+		elif int(msg_UID) < UID:
 			print("Less than")
 			participant = True
 			client.publish(IP, "election - " + str(UID))
